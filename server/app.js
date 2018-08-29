@@ -8,7 +8,6 @@ const app = express();
 // Middlewares
 require('./middlewares/middlewares')(app);
 
-
 // Starting the server
 app.listen(port, () => {
   console.log(`App started on port ${port}`);
