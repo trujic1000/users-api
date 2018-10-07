@@ -1,11 +1,12 @@
 const express = require('express');
+const dotenv = require('dotenv').config();
 
 const mongoose = require('./db/mongoose');
 const userRouter = require('./routers/userRouter');
 
-const port = process.env.PORT || 3000;
-
 const app = express();
+
+const port = process.env.PORT || 3000;
 
 // Middlewares
 require('./middlewares/middlewares')(app);
