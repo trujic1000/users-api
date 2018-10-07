@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const bcrypt = require('bcrypt');
+
 
 function signUp(req, res) {
   // Destructure email and password from request
@@ -12,7 +14,7 @@ function signUp(req, res) {
       await user.save();
       res.status(200).json(user);
     } catch (err) {
-      res.status(400).send();
+      res.status(400).send('Mail exist');
     }
   }());
 }
@@ -31,7 +33,44 @@ async function getUsers(req, res) {
   }
 }
 
+async function login(req, res) {
+  // Destructuring email and password from request
+  const { email, password } = req.body;
+  let user;
+  try {
+    user = await User.find({email});
+    // Checking if user exists
+    if(!user.length) {
+      return res.status(401).json({
+        message: 'Auth failed, user doesnt exist'
+      });
+    }
+    bcrypt.compare(password, user[0].password, (error, result) => {
+      if (error) {
+        return res.status(401).json({
+          message: 'Auth failed'
+        });
+      }
+      // If passwords match
+      if (result) {
+        return res.status(200).json({
+          message: 'Auth Successful'
+        });
+      }
+      // If password don't match
+      return res.status(401).json({
+        message: 'Auth failed, password incorrect'
+      });
+    });
+  } catch (err) {
+    return res.status(401).json({
+      message: 'Auth failed, dafuq'
+    });
+  }
+}
+
 module.exports = {
   signUp,
-  getUsers
+  getUsers,
+  login
 };

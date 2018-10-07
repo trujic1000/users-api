@@ -32,6 +32,23 @@ const UserSchema = new mongoose.Schema({
   }]
 });
 
+// Hashing password before saving it to database
+UserSchema.pre('save', function (next) {
+  const user = this;
+
+  // If password is modified, generate salt and hash password
+  if (user.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        user.password = hash;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
+});
+
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;
